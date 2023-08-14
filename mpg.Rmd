@@ -1,0 +1,5 @@
+# mpg.Rmd
+# Summarize city mpg
+# Author Adam Ercanbrack
+
+summerize(mpg$city)

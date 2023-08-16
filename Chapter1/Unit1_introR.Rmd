@@ -118,7 +118,7 @@ df5[df5$Major == "Math",]
 
 # Data Import from csv
 ```{r csv_import}
-Path <- "D:/University/SMU/Doing Data Science/Chapter1/Creativity.csv"
+Path <- "D:/University/SMU/Doing_Data_Science/DDS_repository/Doing-Data-Science/Chapter1/Creativity.csv"
 Example1 = read.csv(Path, header=TRUE)
 Example1
 
@@ -126,12 +126,12 @@ Example1
 
 # Data Import from csv
 ```{r csv_import2}
-Path <- "D:/University/SMU/Doing Data Science/Chapter1/BusinessSales.csv"
+Path <- "D:/University/SMU/Doing_Data_Science/DDS_repository/Doing-Data-Science/Chapter1/BusinessSales.csv"
 Example2 = read.csv(Path, header=TRUE)
 Example2
-# file.choose hangs up every time.
-Example3 = read.csv(file.choose()) 
-Example3
+# file.choose() - pops up behind Rstudio.
+#Example3 = read.csv(file.choose()) 
+#Example3
 
 ```
 
@@ -145,7 +145,7 @@ plot(Example2$ad_tv, Example2$sales, pch=15,xlab="TV Advertising $$$", ylab="Sal
 abline(h=55, col = "red", lwd= 5)
 
 ```
-### plotting wth mpg
+### plotting wth mpg - ggplot2 required
 ```{r}
 plot(mpg$hwy,mpg$cty,pch = 15) #NO LABLES ... AHHH!!!
 plot(mpg$hwy,mpg$cty,pch = 15, main = "City MPG v. Highway MPG", ylab = "City MPG", xlab = "Highways MPG")

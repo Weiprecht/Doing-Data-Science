@@ -1,0 +1,318 @@
+---
+title: "Unit1 Live Session"
+author: "Adam E."
+date: "2023-08-15"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Unit1 assignment 1: Data Science Profile
+```{r Profile}
+# Relative Data Science experience (scale: 1-8).
+relative_exp = c(3,1,1,4,.5,5,3)
+# Define the domains.
+domains = c("Computer Science","Math","Statistics","Machine Learning","Domain Expertise","Communication", "Data Vis")
+
+# Create the data frame.
+df3 = data.frame(Relative_Experience = relative_exp, Domain = domains)
+df3
+
+# Alter margin size to fit labels.
+#par(mar=c(4,3,3,4))
+
+# Create a barplot with relative experience on the y axis and the x axis divided by domain.
+barplot( df3$Relative_Experience, ylim = c(0, 8), names.arg = df3$Domain, las=0, font.axis=1, col="lightblue", ylab="Relative Experience", main="Data Science Domains")
+
+```
+
+
+# Unit 1 assignment 2: Central Limit Theorem (CLT)
+# Generate a population of 10,000,000 from a chi-square distribution with 2 degrees of freedom.
+# Adapted from (https://statisticsglobe.com/chi-square-distribution-in-r-dchisq-pchisq-qchisq-rchisq)
+```{r CLT_Population}
+set.seed(5000)                                    # Set seed to make example reproducibile
+N <- 10000000                                     # Specify sample size (population)
+
+pop_values <- rchisq(N, df = 2)                   # Draw N chi squared distributed values
+pop_values                                          # with selected degrees of freedom
+
+hist(pop_values,                                  # Plot of randomly drawn chisq density
+     breaks = 200,
+     main = "Chi-square distribution with 2df")
+```
+# 3 - Record the mean and standard deviation of this population.
+# Adapted from (https://www.statology.org/standard-deviation-in-r/)
+```{r sd_and_mean}
+# Find the standard deviation of a vector
+pop_sd <- sd(c(pop_values))
+pop_sd
+
+pop_m <- mean(c(pop_values))
+pop_m
+
+# --------------Alternative--------------------------------
+# Create a data frame
+pop_df <- data.frame(points = c(pop_values))
+#pop_df
+# Find the standard deviation of a column
+pop_df_sd <- sd(pop_df$points)
+# Find the mean of a column
+pop_df_m <- mean(pop_df$points)
+#pop_df_sd
+#pop_df_m
+
+# aggregate several columns
+#aggregate(pop_df.points, list(pop_df$names), FUN=sd)
+
+lotto1 <- sample(c(pop_values), 50, replace = FALSE)
+
+lotto1
+
+```
+# According to the central limit theorem, what should be the approximate distribution of sample means of size 50 from this right skewed population?  What should be the mean and standard error of the mean (standard deviation of the distribution of sample means)?
+# Adapted from (https://bookdown.org/dli/rguide/samples-and-distributions.html)
+```{r sampleMean_sample}
+
+set.seed(100)
+
+# Sample size of 50
+# create empty to hold the means
+sample_means <- c( )
+for(i in 1:10000){
+        sample_means[i] <- mean(sample(c(pop_values), 50, replace = TRUE))
+}
+hist(sample_means, xlim = c(0,5), main = "Sample Size of 50", xlab = "Sample Means")
+mean_samp_all <-mean(sample_means)
+mean_samp_all
+
+sd_samp_all <-sd(sample_means)
+sd_samp_all
+
+```
+
+
+
+
+
+## Control Parameters
+```{r}
+
+#df = read.table("/Users/bivin/Desktop/OLD COMPUTER ARCHIVES/KadAfrica/MSDS/DDS/MSDS 6306/Unit 5/yob2016.txt",stringsAsFactors = FALSE,header = FALSE,sep = ";")
+n1 = 50 # sample size per sample for 1st distribution
+n2 = 50 # sample size per sample for 2nd distribution (we will compare these distribuions) 
+simulations = 10000 #number of samples and thus number of xbars we will generate.  
+mu = 2.005591; # mean parameter for use with normal distribuions
+sigma = 0.2827237; # standard deviation parameter for use with normal distribuions
+```
+
+## Data Holder
+```{r}
+xbar_holder1 = numeric(simulations) # This will hold all the sample means for the first distribution.
+xbar_holder2 = numeric(simulations) # This will hold all the sample means for the second distribution.
+```
+
+## Simulate and Store
+Generate 1000 samples each of size 10 and find the mean of each sample.  Then store each mean in the xbar_holder vector.
+
+```{r}
+for (i in 1:simulations)
+{ 
+  sample1 = rnorm(n1,mean = mu, sd = sigma)
+  sample2 = rnorm(n2,mean = mu, sd = sigma)
+  xbar1 = mean(sample1)
+  xbar2 = mean(sample2)
+  xbar_holder1[i] = xbar1
+  xbar_holder2[i] = xbar2
+  
+}
+  #xbar_holder1
+  x_holder1_Mean <-mean(xbar_holder1)
+  x_holder1_sd <-sd(xbar_holder1)
+  x_holder1_Mean
+  x_holder1_sd
+  x_holder2_Mean <-mean(xbar_holder2)
+  x_holder2_sd <-sd(xbar_holder2)
+  x_holder2_Mean
+  x_holder2_sd
+  #xbar_holder2
+```
+
+## display the distribution of sample means (plot a histogram of the sample means)
+```{r}
+par(mfrow = c(2,1))
+hist(xbar_holder1, col = "blue", main = paste("Distribution of the sample mean: n = ", n1), xlab = "Dist 1 Sample Means", xlim = c(1.5,2.5))
+hist(xbar_holder2, col = "red", main = paste("Distribution of the sample mean: n = ", n2), xlab = "Dist 2 Sample Means", xlim = c(1.5,2.5))
+```
+
+# ChatGPT Pop Hist
+```{r}
+# Install and load the ggplot2 library if not already installed
+if (!require(ggplot2)) {
+  install.packages("ggplot2")
+}
+library(ggplot2)
+
+# Set the seed for reproducibility
+set.seed(123)
+
+# Generate data from a chi-square distribution with 2 degrees of freedom
+population_size <- 10000000
+degrees_of_freedom <- 2
+data <- rchisq(population_size, df = degrees_of_freedom)
+
+# Create a histogram using ggplot2
+ggplot(data.frame(x = data), aes(x)) +
+  geom_histogram(binwidth = 0.5, fill = "blue", color = "black") +
+  labs(title = "Histogram of Chi-Square Distribution (2 degrees of freedom)",
+       x = "Value", y = "Frequency") +
+  theme_minimal()
+```
+
+```{r}
+pop_sd <- sd(c(data))
+pop_sd
+
+pop_m <- mean(c(data))
+pop_m
+```
+# ChatGPT calculations
+```{r}
+# Install and load the ggplot2 library if not already installed
+if (!require(ggplot2)) {
+  install.packages("ggplot2")
+}
+library(ggplot2)
+
+# Set the seed for reproducibility
+set.seed(123)
+
+# Parameters
+population_size <- 10000000
+sample_size <- 50
+num_samples <- 10000
+
+# Generate data from a chi-square distribution with 2 degrees of freedom
+data <- rchisq(population_size, df = 2)
+
+# Initialize a vector to store sample means
+sample_means <- numeric(num_samples)
+
+# Draw 10,000 sample means of size 50 and store them in the vector
+for (i in 1:num_samples) {
+  sample <- sample(data, size = sample_size)
+  sample_means[i] <- mean(sample)
+}
+
+# Create a histogram of the sample means using ggplot2
+ggplot(data.frame(x = sample_means), aes(x)) +
+  geom_histogram(binwidth = 0.1, fill = "blue", color = "black") +
+  labs(title = "Sampling Distribution of Sample Means",
+       x = "Sample Mean", y = "Frequency") +
+  theme_minimal()
+
+```
+# ChatGPT final
+```{r}
+# Calculate the mean and standard deviation of the 10,000 sample means
+mean_sample_means <- mean(sample_means)
+sd_sample_means <- sd(sample_means)
+
+# Print the results
+cat("Mean of the sample means:", mean_sample_means, "\n")
+cat("Standard deviation of the sample means:", sd_sample_means, "\n")
+```
+# ChatGPT final comparison
+```{r}
+n1 = 50 # sample size per sample for 1st distribution
+n2 = 50 # sample size per sample for 2nd distribution (we will compare these distributions) 
+simulations = 10000 # number of samples and thus number of xbars we will generate.  
+mu = 2.005591; # mean parameter for use with normal distributions
+sigma = 0.2827237; # standard deviation parameter for use with normal distributions
+
+xbar_holder1 = numeric(simulations) # This will hold all the sample means for the first distribution.
+xbar_holder2 = numeric(simulations) # This will hold all the sample means for the second distribution.
+sd_holder1 = numeric(simulations)   # This will hold all the sample standard deviations for the first distribution.
+sd_holder2 = numeric(simulations)   # This will hold all the sample standard deviations for the second distribution.
+
+for (i in 1:simulations) { 
+  sample1 = rnorm(n1, mean = mu, sd = sigma)
+  sample2 = rnorm(n2, mean = mu, sd = sigma)
+  xbar1 = mean(sample1)
+  xbar2 = mean(sample2)
+  sd1 = sd(sample1)
+  sd2 = sd(sample2)
+  
+  xbar_holder1[i] = xbar1
+  xbar_holder2[i] = xbar2
+  sd_holder1[i] = sd1
+  sd_holder2[i] = sd2
+}
+
+par(mfrow = c(2, 2))
+
+hist(xbar_holder1, col = "blue", main = paste("Distribution of Sample Mean (n =", n1, ")"), xlab = "Sample Mean", xlim = c(1.5, 2.5))
+hist(xbar_holder2, col = "red", main = paste("Distribution of Sample Mean (n =", n2, ")"), xlab = "Sample Mean", xlim = c(1.5, 2.5))
+
+hist(sd_holder1, col = "blue", main = paste("Distribution of Sample SD (n =", n1, ")"), xlab = "Sample Standard Deviation", xlim = c(0.1, 0.5))
+hist(sd_holder2, col = "red", main = paste("Distribution of Sample SD (n =", n2, ")"), xlab = "Sample Standard Deviation", xlim = c(0.1, 0.5))
+```
+```{r}
+par(mfrow = c(2, 1))
+hist(xbar_holder1, col = "blue", main = paste("Distribution of Sample Mean (n =", n1, ")"), xlab = "Sample Mean", xlim = c(1.5, 2.5))
+hist(xbar_holder2, col = "red", main = paste("Distribution of Sample Mean (n =", n2, ")"), xlab = "Sample Mean", xlim = c(1.5, 2.5))
+```
+# Part 4: T-Test (2-3 hours)
+Research in R how to conduct a T-test (t.test) and conduct a six step hypothesis test to answer the question on the next slide.  If you would like to brush up on hypothesis tests, please see the Bridge Course for Statistics. 
+
+# "The following are ages of 7 randomly chosen patrons seen leaving the Beach Comber in South Mission Beach at 7pm!  We assume that the data come from a normal distribution and would like to test the claim that the mean age of the distribution of Comber patrons is different than 21.  Conduct a 6 step hypothesis test to test this claim.  
+	25, 19, 37, 29, 40, 28, 31"
+# Step 1: H0: Beach Comber patrons' ages are, on average, equal to 21. Ha: Beach Comber patrons' ages are, on average, not equal to 21.  
+# Step 2: Draw and shade the model - because the alternative hypothesis is not equal to 21, this is a (Two-tailed) model with 0.025 on the extreme ends.
+# Step 3: Test the sample against the hypothesis: The test statistic is 3.309315
+# Step 4: Quantify the difference: t-score = 3.3093, p-value = 0.01622
+# Step 5: Decide to reject or fail to reject (FTR) H0: Since the p-value (0.01622) is < the alpha (0.025), we fail to reject the null hypothesis.
+# Step 6: Conclusion: There is sufficient evidence to suggest (p-value 0.01622) that the mean age of patrons is not different than 21.
+
+```{r BeachComber_vector}
+#define vector of turtle weights
+patron_ages <- c(25, 19, 37, 29, 40, 28, 31)
+n <- length(patron_ages) # total samples
+m_ages <- mean(patron_ages) # xbar - sample mean
+
+# Variance in the sample data - called S2
+# If you are finding the population variance then append *(n-1)/n to var(data)
+variance_ages <- var(patron_ages) 
+
+cat("Patrons' mean age is :", m_ages, "\n")
+cat("The variance in the data is :", variance_ages, "\n")
+
+# T- (value) statistic
+t_obs = (m_ages - 21)/(sqrt(variance_ages/n))
+cat("The T-statistic is :", t_obs, "\n")
+
+#perform one sample t-test
+t.test(x = patron_ages, alternative="two.sided", mu = 21, conf.level=0.95)
+
+```
+# Confirm where the p-value falls
+```{r}
+# If the p-value < the alpha (True) you will fail to reject the H0. If the p-value > than the alpha (False) you reject the null hypothesis.
+.01622 < .025
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

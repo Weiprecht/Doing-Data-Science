@@ -33,7 +33,7 @@ barplot( df3$Relative_Experience, ylim = c(0, 8), names.arg = df3$Domain, las=0,
 # Generate a population of 10,000,000 from a chi-square distribution with 2 degrees of freedom.
 # Adapted from (https://statisticsglobe.com/chi-square-distribution-in-r-dchisq-pchisq-qchisq-rchisq)
 ```{r CLT_Population}
-set.seed(5000)                                    # Set seed to make example reproducibile
+set.seed(5000)                                    # Set seed to make example reproducible
 N <- 10000000                                     # Specify sample size (population)
 
 pop_values <- rchisq(N, df = 2)                   # Draw N chi squared distributed values

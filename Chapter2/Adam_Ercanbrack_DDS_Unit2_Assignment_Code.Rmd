@@ -1,0 +1,387 @@
+---
+title: "Adam Ercanbrack Unit2 LiveSession Assignment"
+author: "Adam E."
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages("gganimate")
+```
+
+```{r load_library}
+
+library(tidyverse)
+library(ggplot2)
+library(ggthemes)
+library(plotly)
+
+```
+
+# Data Import from csv
+```{r csv_import2}
+Path <- "D:/University/SMU/Doing_Data_Science/DDS_repository/Doing-Data-Science/Chapter2/PlayersBBall.csv"
+BBallP = read.csv(Path, header=TRUE)
+
+summary(BBallP)
+# Keep only rows in the position column where the value is not NA or empty.
+BBallP_C <- BBallP[!(is.na(BBallP$position) | BBallP$position ==""),]
+
+# Verify that all empties are removed.
+x <- unique(BBallP_C$position)
+x
+
+BBallP_C
+
+summary(BBallP_C)
+
+
+```
+# Q:1 - Use the PlayerBBall.csv dataset to visually represent (summarize) 
+the number of players in each position.
+```{r Summary_by_position}
+# visually summarize the players in each position
+BBallP_C %>% 
+  ggplot(mapping = aes(x = position)) + 
+  geom_bar(color = "black", fill = "blue") +
+  ggtitle("Summary of Basketball Players") + # Title
+  xlab("Position") + ylab("Number of Players") + # x and y labels
+  theme_economist()
+```
+# Q:2 - Use the dataset to visually investigate whether the distribution of the 
+weight of centers (C) is greater than the distribution of the weight of forwards (F).
+```{r Weight_distribution }
+# Create a new DF that only hold the positions of C or F.
+BBallC_F <- BBallP_C[(BBallP_C$position == "C" | BBallP_C$position == "F"),]
+BBallC_F
+
+# Replace the value names
+BBallC_F2 <- BBallC_F %>%
+mutate(position = recode(position, "C" = "Center", "F" = "Forward")) %>%
+        arrange(weight, position )
+BBallC_F2
+
+# Use a boxplot to visualize the weights
+BBallC_F2 %>% 
+  ggplot(aes(x = weight, y = BBallC_F2$position, )) + geom_boxplot(color= "black", fill = "grey") +
+  ggtitle("Weight Distribution: Forwards vs. Centers") + # Title
+  xlab("Weight of Player") + ylab("Player's Position") + # x and y labels
+  theme_economist()
+
+```
+# Q:3 - Use the dataset to visually investigate if the distribution of the 
+height of centers (C) is greater than the distribution of the height of 
+forwards (F).
+```{r Height_distribution }
+# Create a new DF that only hold the positions of C or F.
+BBallC_F <- BBallP_C[(BBallP_C$position == "C" | BBallP_C$position == "F"),]
+BBallC_F
+
+# Replace the value names
+BBallC_F3 <- BBallC_F %>%
+mutate(position = recode(position, "C" = "Center", "F" = "Forward")) %>%
+  mutate(height = recode(height, "6-0" = "72", "6-1" = "73", "6-2" = "74", 
+                         "6-3" = "75", "6-4" = "76", "6-5" = "77", "6-6" = "78",
+                         "6-7" = "79", "6-8" = "80", "6-9" = "81", "6-10" = "82",
+                         "6-11" = "83", "7-0" = "84", "7-1" = "85", "7-2" = "86",
+                         "7-3" = "87", "7-4" = "88", "7-5" = "89", "7-6" = "90", 
+                         "7-7" = "91",)) %>%
+        arrange(height, position )
+# change the height column from chr to int
+BBallC_F3$height <- as.numeric(BBallC_F3$height)
+BBallC_F3
+
+# Use a boxplot to visualize the heights
+BBallC_F3 %>% 
+  ggplot(aes(x = BBallC_F3$position, y = BBallC_F3$height)) + 
+  geom_boxplot(color= "black", fill = "grey") +
+  ggtitle("Height Distribution: Centers vs. Forwards") + # Title
+  xlab("Player's Position") + ylab("Height (In inches)") + # x and y labels
+  theme_economist()
+
+```
+# Q:4 - Use the dataset to visually investigate if the distribution of height 
+is different between any of the positions.
+```{r Height_distribution }
+# Replace the value names
+BBallP_C4 <- BBallP_C %>%
+
+  mutate(height = recode(height, "6-0" = "72", "6-1" = "73", "6-2" = "74", 
+                         "6-3" = "75", "6-4" = "76", "6-5" = "77", "6-6" = "78",
+                         "6-7" = "79", "6-8" = "80", "6-9" = "81", "6-10" = "82",
+                         "6-11" = "83", "7-0" = "84", "7-1" = "85", "7-2" = "86",
+                         "7-3" = "87", "7-4" = "88", "7-5" = "89", "7-6" = "90", 
+                         "7-7" = "91",)) %>%
+        arrange(height, position )
+
+# change the height column from chr to int
+BBallP_C4 $height <- as.numeric(BBallP_C4$height)
+BBallP_C4 
+
+# Use a boxplot to visualize the heights
+BBallP_C4  %>% 
+  ggplot(aes(x = BBallP_C4$position, y = BBallP_C4 $height)) + 
+  geom_boxplot(color= "black", fill = "grey") +
+  ggtitle("Height Distribution: All Positions") + # Title
+  xlab("Player's Position") + ylab("Height (In inches)") + # x and y labels
+  theme_economist()
+```
+# Q:5 - Use the dataset to investigate how the player’s height is related to 
+the player’s weight. How does height change as the weight changes?  
+```{r Weight_Height_relate}
+# Replace the value names
+BBallP_C4 <- BBallP_C %>%
+  mutate(height = recode(height, "6-0" = "72", "6-1" = "73", "6-2" = "74", 
+                         "6-3" = "75", "6-4" = "76", "6-5" = "77", "6-6" = "78",
+                         "6-7" = "79", "6-8" = "80", "6-9" = "81", "6-10" = "82",
+                         "6-11" = "83", "7-0" = "84", "7-1" = "85", "7-2" = "86",
+                         "7-3" = "87", "7-4" = "88", "7-5" = "89", "7-6" = "90", 
+                         "7-7" = "91",)) %>%
+        arrange(height, position )
+
+# change the height column from chr to int
+BBallP_C4 $height <- as.numeric(BBallP_C4$height)
+BBallP_C4 
+
+# Jitter plot with a line and labels in economist theme
+BBallP_C4 %>% 
+  ggplot(aes(x = height, y = weight)) + geom_jitter(aes(size=weight)) +
+  geom_smooth(method=lm, se=FALSE) + # Add a regression line
+  ggtitle("Relation of Weight to Height: All Positions") + # Title
+  xlab("Height (In inches)") + ylab("Player's Weight") + # x and y labels
+  theme_economist()
+
+```
+# Q:6 - Is their any difference in the relationship between height and weight 
+between positions?  Are height and weight related differently for different 
+positions.  
+```{r Weight_Height_relate}
+# Replace the value names
+BBallP_C4 <- BBallP_C %>%
+  mutate(height = recode(height, "6-0" = "72", "6-1" = "73", "6-2" = "74", 
+                         "6-3" = "75", "6-4" = "76", "6-5" = "77", "6-6" = "78",
+                         "6-7" = "79", "6-8" = "80", "6-9" = "81", "6-10" = "82",
+                         "6-11" = "83", "7-0" = "84", "7-1" = "85", "7-2" = "86",
+                         "7-3" = "87", "7-4" = "88", "7-5" = "89", "7-6" = "90", 
+                         "7-7" = "91",)) %>%
+        arrange(height, position )
+
+# change the height column from chr to int
+BBallP_C4 $height <- as.numeric(BBallP_C4$height)
+BBallP_C4 
+
+# Jitter plot with a line and labels in economist theme
+BBallP_C4 %>% 
+  ggplot(aes(x = height, y = weight, color = position)) + 
+  geom_jitter(aes(size=weight)) +
+  geom_smooth(method=lm, se=FALSE, color = "black") + # Add a regression line
+  facet_wrap(~position) + # Break into individual graphs
+  ggtitle("Relation of Weight to Height: All Positions") + # Title
+  xlab("Height (In inches)") + ylab("Player's Weight") + # x and y labels
+  theme_economist()
+```
+Q:7 - A historian would like to investigate the claim that the heights of 
+players have increased over the years.  Analyze this claim graphically / visually. 
+```{r Weight_Height_relate}
+# Replace the value names
+BBallP_C4 <- BBallP_C %>%
+  mutate(height = recode(height, "6-0" = "72", "6-1" = "73", "6-2" = "74", 
+                         "6-3" = "75", "6-4" = "76", "6-5" = "77", "6-6" = "78",
+                         "6-7" = "79", "6-8" = "80", "6-9" = "81", "6-10" = "82",
+                         "6-11" = "83", "7-0" = "84", "7-1" = "85", "7-2" = "86",
+                         "7-3" = "87", "7-4" = "88", "7-5" = "89", "7-6" = "90", 
+                         "7-7" = "91",)) %>%
+        arrange(height, position )
+
+# change the height column from chr to int
+BBallP_C4 $height <- as.numeric(BBallP_C4$height)
+BBallP_C4 
+
+# Create a line plot using ggplot2
+BBallP_C4 %>% 
+ggplot(aes(x = year_start, y = height)) +
+  geom_point() +
+  geom_smooth(method=lm, se=FALSE, color = "red") + # Add a regression line
+    facet_wrap(~position) +
+  labs(title = "Heights of Players Since 1940",
+       x = "Starting Year",
+       y = "Height") +
+  theme_economist()
+```
+
+Q:7 - (failed attempt) A historian would like to investigate the claim that the heights of 
+players have increased over the years.  Analyze this claim graphically / visually.
+```{r}
+average_heights <- BBallP_C4 %>%
+  group_by(year_start) %>%
+  summarise(AverageHeight = mean(height))
+
+# Create a line plot using ggplot2
+BBallP_C4 %>% 
+ggplot(aes(x = year_start, fill = height)) +
+  geom_histogram() +
+  facet_wrap(~position) +
+  labs(title = "Trend in Player Heights Over the Years",
+       x = "Year",
+       y = "Height") +
+  theme_minimal()
+
+```
+
+Q:8 - Create a 3D plot of height vs. weight vs. year and color code the 
+points by position. 
+```{r Weight_Height_relate}
+# Replace the value names
+BBallP_C4 <- BBallP_C %>%
+  mutate(height = recode(height, "6-0" = "72", "6-1" = "73", "6-2" = "74", 
+                         "6-3" = "75", "6-4" = "76", "6-5" = "77", "6-6" = "78",
+                         "6-7" = "79", "6-8" = "80", "6-9" = "81", "6-10" = "82",
+                         "6-11" = "83", "7-0" = "84", "7-1" = "85", "7-2" = "86",
+                         "7-3" = "87", "7-4" = "88", "7-5" = "89", "7-6" = "90", 
+                         "7-7" = "91",)) %>%
+        arrange(height, position )
+
+# change the height column from chr to int
+BBallP_C4 $height <- as.numeric(BBallP_C4$height)
+BBallP_C4 
+
+# 3D plot 
+p <- plot_ly(BBallP_C4, x = ~year_start, y = ~weight, z = ~height,
+             color = ~position) %>%
+   add_markers() %>%
+   layout(title = "Heights of Players From 1940 to 2020", 
+          scene = list(xaxis = list(title = 'Starting Year'),
+                      yaxis = list(title = 'Weight'),
+                      zaxis = list(title = 'Height')))
+p
+```
+
+Q:9 - Go to this website and use one of the 50 best plots to visualize some 
+aspect of the data and provide at least one insight.  You will present your 
+work in breakout!
+http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html
+
+```{r factored boxplot}
+g <- ggplot(BBallP_C4, aes(height, position))
+g + geom_boxplot(aes(fill=factor(position))) + 
+  theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
+  labs(title="Height of Players:", 
+       subtitle="By Position",
+       caption="Source: PlayersBBall",
+       x="Height",
+       y="Position")
+```
+
+```{r animate_year}
+# Source: https://github.com/dgrtwo/gganimate
+# install.packages("cowplot")  # a gganimate dependency
+# devtools::install_github("dgrtwo/gganimate")
+library(ggplot2)
+library(gganimate)
+library(gapminder)
+theme_set(theme_bw())  # pre-set the bw theme.
+
+p <- ggplot(
+  BBallP_C4, 
+  aes(x = height, y = weight, colour = position)
+  ) +
+  geom_jitter(show.legend = FALSE, alpha = 0.7) +
+  scale_color_viridis_d() +
+  scale_size(range = c(2, 12)) +
+  scale_x_log10() + # convert to log scale
+  labs(x = "Player Height", y = "Player Weight")
+p
+#p + transition_time(year_start) +
+  #labs(title = "Year: {frame_time}")
+p
+#gganimate(g, interval=0.2)
+```
+
+# Data Import from csv
+```{r csv_import3}
+Path <- "D:/University/SMU/Doing_Data_Science/DDS_repository/Doing-Data-Science/Chapter2/Education_Income.csv"
+Ed_Income = read.csv(Path, header=TRUE)
+
+summary(Ed_Income)
+unique(Ed_Income$Educ)
+Ed_Income
+```
+
+```{r Education_Income_Relate}
+# Replace the value names
+Ed_Income3 <- Ed_Income %>%
+  mutate(Educ = recode(Educ, ">16" = "16>", "<12" = "12-", "12" = "12-13")) %>%
+        arrange(Educ, Income2005 )
+
+Ed_Income2 <- Ed_Income
+# change the height column from chr to int
+Ed_Income2$Educ <- as.numeric(Ed_Income2$Educ)
+Ed_Income2 
+
+# Jitter plot with a line and labels in economist theme
+Ed_Income2 %>% 
+  ggplot(aes(x = Educ, y = Income2005)) + geom_jitter(aes(size=Income2005)) +
+  geom_smooth(method=lm, se=FALSE) + # Add a regression line
+  ggtitle("Relation of Education to total Earnings") + # Title
+  xlab("Education Level") + ylab("2005 Income") + # x and y labels
+  theme_economist()
+
+# Use a boxplot to visualize the heights
+Ed_Income3  %>% 
+  ggplot(aes(x = Educ, y = Income2005)) + 
+  geom_boxplot(color= "black", fill = "grey") +
+  ggtitle("Relation of Education to total Earnings") + # Title
+  xlab("Education Level") + ylab("2005 Income") + # x and y labels
+  theme_economist()
+
+```
+
+# ChatGPT code: Question2 create a dataset to visually investigate the distribution of the 
+weight of centers (C) is greater than the distribution of the weight of forwards (F). 
+```{r chatGPT_scatter}
+
+# Create a scatterplot using ggplot2
+BBallC_F %>% 
+  ggplot(aes(x = position, y = weight, color = position)) +
+  geom_jitter() +
+  labs(title = "Weight Distribution: Centers vs. Forwards",
+       x = "Position",
+       y = "Weight") +
+  scale_color_manual(values = c("C" = "blue", "F" = "red")) +
+  theme_economist()
+```
+
+# ChatGPT output
+```{r CHatGPT_examples}
+# Sample dataset (replace with your actual dataset)
+height_data <- data.frame(
+  Gender = c("Male", "Female", "Male", "Female", "Male", "Female"),
+  Height = c(175, 162, 180, 157, 170, 165)
+)
+
+# Boxplot showing differences in height between men and women
+ggplot(height_data, aes(x = Gender, y = Height, fill = Gender)) +
+  geom_boxplot() +
+  labs(title = "Differences in Height between Men and Women",
+       x = "Gender",
+       y = "Height") +
+  scale_fill_manual(values = c("Male" = "blue", "Female" = "pink")) +
+  theme_minimal()
+
+# Density plot showing differences in height between men and women
+ggplot(height_data, aes(x = Height, fill = Gender)) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Differences in Height between Men and Women",
+       x = "Height",
+       y = "Density") +
+  scale_fill_manual(values = c("Male" = "blue", "Female" = "pink")) +
+  theme_minimal()
+```
+
+
+
+
